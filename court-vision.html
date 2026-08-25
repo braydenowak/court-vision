@@ -10,16 +10,17 @@
   <table id = "player-table">
     <thead>
       <tr>
-        <th>Player</th>
-        <th>Team</th>
-        <th>Pos</th>
+        //Headers, sortable
+        <th onclick="sortTable('Player')">Player</th>
+        <th onclick="sortTable('Team')">Team</th>
+        <th onclick="sortTable('Pos')">Pos</th>
         <th onclick="sortTable('PER')">PER</th>
-        <th>TS%</th>
-        <th>TRB%</th>
-        <th>AST%</th>
-        <th>USG%</th>
-        <th>WS</th>
-        <th>BPM</th>
+        <th onclick="sortTable('TS%')">TS%</th>
+        <th onclick="sortTable('TRB%')">TRB%</th>
+        <th onclick="sortTable('AST%')">AST%</th>
+        <th onclick="sortTable('USG%')">USG%</th>
+        <th onclick="sortTable('WS')">WS</th>
+        <th onclick="sortTable('BPM')">BPM</th>
       </tr>
     </thead>
     <tbody id = "player-table-body"></tbody>
@@ -43,7 +44,7 @@
               <td>${player["TS%"]}</td>
               <td>${player["TRB%"]}</td>
               <td>${player["AST%"]}</td>
-              <td>${player["USB%"]}</td>
+              <td>${player["USG%"]}</td>
               <td>${player.WS}</td>
               <td>${player["WS/48"]}</td>
             `;
