@@ -19,7 +19,7 @@
       <select id="x-axis-select" onchange="updateScatter()">
         <option value="Avg PER" selected>Avg PER</option>
         <option value="Avg TS%">Avg TS%</option>
-        <option value="Avg USG%">Avg USG</option>
+        <option value="Avg USG%">Avg USG%</option>
         <option value="Avg WS/48">Avg WS/48</option>
         <option value="Avg BPM">Avg BPM</option>
         <option value="Total VORP">Total VORP</option>
@@ -30,14 +30,25 @@
       <select id="y-axis-select" onchange="updateScatter()">
         <option value="Avg PER">Avg PER</option>
         <option value="Avg TS%">Avg TS%</option>
-        <option value="Avg USG%">Avg USG</option>
+        <option value="Avg USG%">Avg USG%</option>
         <option value="Avg WS/48">Avg WS/48</option>
         <option value="Avg BPM">Avg BPM</option>
         <option value="Total VORP" selected>Total VORP</option>
       </select>
     </label>
 
+    <label>Metric:
+      <select id="metric-select" onchange="updateRankingChart()">
+        <option value="Avg PER" selected>Avg PER</option>
+        <option value="Avg TS%">Avg TS%</option>
+        <option value="Avg USG%">Avg USG%</option>
+        <option value="Avg WS/48">Avg WS/48</option>
+        <option value="Total VORP">Total VORP</option>
+      </select>
+    </label>
+
     <svg id="team-scatter" viewBox="0 0 600 400" width="600" height="400"></svg>
+    <svg id="ranking-chart" width="600"></svg>
     <table id="team-table">
       <thead>
         <tr>
@@ -64,16 +75,16 @@
     <table id = "player-table">
       <thead>
         <tr>
-          <th onclick="sortTable('Player')">Player</th>
-          <th onclick="sortTable('Team')">Team</th>
-          <th onclick="sortTable('Pos')">Pos</th>
-          <th onclick="sortTable('PER')">PER</th>
-          <th onclick="sortTable('TS%')">TS%</th>
-          <th onclick="sortTable('TRB%')">TRB%</th>
-          <th onclick="sortTable('AST%')">AST%</th>
-          <th onclick="sortTable('USG%')">USG%</th>
-          <th onclick="sortTable('WS')">WS</th>
-          <th onclick="sortTable('BPM')">BPM</th>
+          <th onclick="sortPlayerTable('Player')">Player</th>
+          <th onclick="sortPlayerTable('Team')">Team</th>
+          <th onclick="sortPlayerTable('Pos')">Pos</th>
+          <th onclick="sortPlayerTable('PER')">PER</th>
+          <th onclick="sortPlayerTable('TS%')">TS%</th>
+          <th onclick="sortPlayerTable('TRB%')">TRB%</th>
+          <th onclick="sortPlayerTable('AST%')">AST%</th>
+          <th onclick="sortPlayerTable('USG%')">USG%</th>
+          <th onclick="sortPlayerTable('WS')">WS</th>
+          <th onclick="sortPlayerTable('BPM')">BPM</th>
         </tr>
       </thead>
       <tbody id = "player-table-body"></tbody>
@@ -175,7 +186,7 @@
 
       showTab("team-analytics");
 
-      //Render Scatter Function 
+      //Render Team Scatter Function 
       function renderScatter(xKey, yKey){
         const svg = document.getElementById("team-scatter");
         svg.innerHTML =""; //clears old circle
@@ -302,6 +313,56 @@
       }
 
       updateScatter();
+
+      //Render Ranking Chart
+      function renderRankingChart(key){
+        const svg = document.getElementById("ranking-chart");
+        svg.innerHTML = "";
+        
+        const margin = 100;
+        const width = 600;
+        const rowHeight = 18;
+        const height = teamSummary.length * rowHeight + 20;
+        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        svg.setAttribute("height", height);
+
+        const sorted = [...teamSummary].sort((a,b) => b[key] - a[key]);
+        const maxVal = Math.max(...sorted.map(t => t[key]));
+        const svgNS = "http://www.w3.org/2000/svg";
+        
+        sorted.forEach((team, i) => {
+          const y = i *rowHeight;
+          const barWidth = (team[key] / maxVal) * (width - margin - 20);
+
+          //Bar
+          const bar = document.createElementNS(svgNS, "rect");
+          bar.setAttribute("x", margin);
+          bar.setAttribute("y", y);
+          bar.setAttribute("width", barWidth);
+          bar.setAttribute("height", rowHeight - 4);
+          bar.setAttribute("fill", "steelblue");
+          svg.appendChild(bar);
+
+          //Label
+          const label = document.createElementNS(svgNS, "text");
+          label.setAttribute("x", margin - 8);
+          label.setAttribute("y", y + (rowHeight - 4) / 2);
+          label.setAttribute("font-size", "10");
+          label.setAttribute("text-anchor", "end");
+          label.setAttribute("dominant-baseline", "middle");
+          label.textContent = team.Team;
+          svg.appendChild(label);
+
+        });
+      }
+
+      function updateRankingChart(){
+        const key = document.getElementById("metric-select").value;
+        renderRankingChart(key);
+      }
+
+      updateRankingChart();
+
   </script>
 </body>
 </html>
