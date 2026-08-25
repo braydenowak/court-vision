@@ -5,67 +5,96 @@
   <title>Court Vision</title>
 </head>
 <body>
-  <h1>Court Vision</h1>
-  <p>NBA analytics tool — coming soon.</p>
-  <table id = "player-table">
-    <thead>
-      <tr>
-        //Headers, sortable
-        <th onclick="sortTable('Player')">Player</th>
-        <th onclick="sortTable('Team')">Team</th>
-        <th onclick="sortTable('Pos')">Pos</th>
-        <th onclick="sortTable('PER')">PER</th>
-        <th onclick="sortTable('TS%')">TS%</th>
-        <th onclick="sortTable('TRB%')">TRB%</th>
-        <th onclick="sortTable('AST%')">AST%</th>
-        <th onclick="sortTable('USG%')">USG%</th>
-        <th onclick="sortTable('WS')">WS</th>
-        <th onclick="sortTable('BPM')">BPM</th>
-      </tr>
-    </thead>
-    <tbody id = "player-table-body"></tbody>
-  </table>
-    <script src="player_stats.js"></script>
-    <script src="team_stints.js"></script>
-    <script src="team_summary.js"></script>
-    <script>
-        console.log(playerStats.length,teamStints.length, teamSummary.length);
+  <div id="tab-buttons">
+    <button onclick="showTab('team-analytics')">Team Analytics</button>
+    <button onclick="showTab('player-comparison')">Player Comparison</button>
+    <button onclick="showTab('roster-lab')">Roster Lab</button>
+  </div>
 
-        function renderTable(data) {
-          const tableBody = document.getElementById("player-table-body");
-          tableBody.innerHTML = ""; //clears old rows
-          for (const player of data){
-            const row = document.createElement("tr");
-            row.innerHTML = `
-              <td>${player.Player}</td>
-              <td>${player.Team}</td>
-              <td>${player.Pos}</td>
-              <td>${player.PER}</td>
-              <td>${player["TS%"]}</td>
-              <td>${player["TRB%"]}</td>
-              <td>${player["AST%"]}</td>
-              <td>${player["USG%"]}</td>
-              <td>${player.WS}</td>
-              <td>${player["WS/48"]}</td>
-            `;
-            tableBody.appendChild(row);
+  
+  <div id="team-analytics" class="tab-panel">
+    <p>Team Analytics - coming soon.</p>
+  </div>
+
+  
+  <div id="player-comparison" class="tab-panel">
+    <h1>Court Vision</h1>
+    <p>NBA analytics tool — coming soon.</p>
+    <table id = "player-table">
+      <thead>
+        <tr>
+          <th onclick="sortTable('Player')">Player</th>
+          <th onclick="sortTable('Team')">Team</th>
+          <th onclick="sortTable('Pos')">Pos</th>
+          <th onclick="sortTable('PER')">PER</th>
+          <th onclick="sortTable('TS%')">TS%</th>
+          <th onclick="sortTable('TRB%')">TRB%</th>
+          <th onclick="sortTable('AST%')">AST%</th>
+          <th onclick="sortTable('USG%')">USG%</th>
+          <th onclick="sortTable('WS')">WS</th>
+          <th onclick="sortTable('BPM')">BPM</th>
+        </tr>
+      </thead>
+      <tbody id = "player-table-body"></tbody>
+    </table>
+  </div>
+
+  
+  <div id="roster-lab" class="tab-panel">
+    <p>Roster Lab — coming soon.</p>
+  </div>
+
+  <script src="player_stats.js"></script>
+  <script src="team_stints.js"></script>
+  <script src="team_summary.js"></script>
+  <script>
+      console.log(playerStats.length,teamStints.length, teamSummary.length);
+
+      function renderTable(data) {
+        const tableBody = document.getElementById("player-table-body");
+        tableBody.innerHTML = ""; //clears old rows
+        for (const player of data){
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${player.Player}</td>
+            <td>${player.Team}</td>
+            <td>${player.Pos}</td>
+            <td>${player.PER}</td>
+            <td>${player["TS%"]}</td>
+            <td>${player["TRB%"]}</td>
+            <td>${player["AST%"]}</td>
+            <td>${player["USG%"]}</td>
+            <td>${player.WS}</td>
+            <td>${player["WS/48"]}</td>
+          `;
+          tableBody.appendChild(row);
+        }
+      }
+      renderTable(playerStats);
+
+      let sortDirection = {};
+
+      function sortTable(key) {
+        sortDirection[key] = !sortDirection[key]; // flip true/false each click
+        const sorted = [...playerStats].sort((a, b) => {
+          if (sortDirection[key]) {
+            return a[key] > b[key] ? 1 : -1;
+          } else {
+            return a[key] < b[key] ? 1 : -1;
           }
-        }
-        renderTable(playerStats);
+        });
+        renderTable(sorted);
+      }
 
-        let sortDirection = {};
-
-        function sortTable(key) {
-          sortDirection[key] = !sortDirection[key]; // flip true/false each click
-          const sorted = [...playerStats].sort((a, b) => {
-            if (sortDirection[key]) {
-              return a[key] > b[key] ? 1 : -1;
-            } else {
-              return a[key] < b[key] ? 1 : -1;
-            }
-          });
-          renderTable(sorted);
+      function showTab(tabId){
+        const panels = document.querySelectorAll(".tab-panel");
+        for (const panel of panels){
+          panel.style.display = "none";
         }
-    </script>
+        document.getElementById(tabId).style.display = "block";
+      }
+
+      showTab("team-analytics");
+  </script>
 </body>
 </html>
