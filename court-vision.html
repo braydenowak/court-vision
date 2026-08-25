@@ -147,12 +147,14 @@
       }
       renderTeamTable(teamSummary);
 
-      let playerSortDirection
-      let teamSortDirection = {};
+      
 
       //Sort Table Functions
+      let playerSortDirection = {};
+      let teamSortDirection = {};
+
       function sortPlayerTable(key) {
-        sortDirection[key] = !sortDirection[key]; // flip true/false each click
+        playerSortDirection[key] = !playerSortDirection[key]; // flip true/false each click
         const sorted = [...playerStats].sort((a, b) => {
           if (playerSortDirection[key]) {
             return a[key] > b[key] ? 1 : -1;
@@ -164,7 +166,7 @@
       }
 
       function sortTeamTable(key) {
-        sortDirection[key] = !sortDirection[key]; // flip true/false each click
+        teamSortDirection[key] = !teamSortDirection[key]; // flip true/false each click
         const sorted = [...teamSummary].sort((a, b) => {
           if (teamSortDirection[key]) {
             return a[key] > b[key] ? 1 : -1;
