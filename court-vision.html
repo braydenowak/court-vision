@@ -11,15 +11,56 @@
     <button onclick="showTab('roster-lab')">Roster Lab</button>
   </div>
 
-  
+  <!-- Team Analytics Panel-->
   <div id="team-analytics" class="tab-panel">
-    <p>Team Analytics - coming soon.</p>
+    <h1>Court Vision</h1>
+
+    <label>X axis:
+      <select id="x-axis-select" onchange="updateScatter()">
+        <option value="Avg PER" selected>Avg PER</option>
+        <option value="Avg TS%">Avg TS%</option>
+        <option value="Avg USG%">Avg USG</option>
+        <option value="Avg WS/48">Avg WS/48</option>
+        <option value="Avg BPM">Avg BPM</option>
+        <option value="Total VORP">Total VORP</option>
+      </select>
+    </label>
+
+    <label>Y axis:
+      <select id="y-axis-select" onchange="updateScatter()">
+        <option value="Avg PER">Avg PER</option>
+        <option value="Avg TS%">Avg TS%</option>
+        <option value="Avg USG%">Avg USG</option>
+        <option value="Avg WS/48">Avg WS/48</option>
+        <option value="Avg BPM">Avg BPM</option>
+        <option value="Total VORP" selected>Total VORP</option>
+      </select>
+    </label>
+
+    <svg id="team-scatter" viewBox="0 0 600 400" width="600" height="400"></svg>
+    <table id="team-table">
+      <thead>
+        <tr>
+        <th onclick="sortTeamTable('Team')">Team</th>
+        <th onclick="sortTeamTable('Players')">Players</th>
+        <th onclick="sortTeamTable('Total G')">Total G</th>
+        <th onclick="sortTeamTable('Avg MP')">Avg MP</th>
+        <th onclick="sortTeamTable('Avg PER')">Avg PER</th>
+        <th onclick="sortTeamTable('Avg TS%')">Avg TS%</th>
+        <th onclick="sortTeamTable('Avg USG%')">Avg USG%</th>
+        <th onclick="sortTeamTable('Total WS')">Total WS</th>
+        <th onclick="sortTeamTable('Avg WS/48')">Avg WS/48</th>
+        <th onclick="sortTeamTable('Avg BPM')">Avg BPM</th>
+        <th onclick="sortTeamTable('Total VORP')">Total VORP</th>
+        </tr>
+      </thead>
+      <tbody id="team-table-body"></tbody>
+    </table>
   </div>
 
-  
+  <!-- Player Comparison Panel-->
   <div id="player-comparison" class="tab-panel">
     <h1>Court Vision</h1>
-    <p>NBA analytics tool — coming soon.</p>
     <table id = "player-table">
       <thead>
         <tr>
@@ -39,7 +80,7 @@
     </table>
   </div>
 
-  
+  <!-- Roster Lab Panel-->
   <div id="roster-lab" class="tab-panel">
     <p>Roster Lab — coming soon.</p>
   </div>
@@ -49,8 +90,8 @@
   <script src="team_summary.js"></script>
   <script>
       console.log(playerStats.length,teamStints.length, teamSummary.length);
-
-      function renderTable(data) {
+      //Render Table Functions
+      function renderPlayerTable(data) {
         const tableBody = document.getElementById("player-table-body");
         tableBody.innerHTML = ""; //clears old rows
         for (const player of data){
@@ -65,27 +106,65 @@
             <td>${player["AST%"]}</td>
             <td>${player["USG%"]}</td>
             <td>${player.WS}</td>
-            <td>${player["WS/48"]}</td>
+            <td>${player["BPM"]}</td>
           `;
           tableBody.appendChild(row);
         }
       }
-      renderTable(playerStats);
+      renderPlayerTable(playerStats);
+      
+      function renderTeamTable(data) {
+        const tableBody = document.getElementById("team-table-body");
+        tableBody.innerHTML = ""; //clears old rows
+        for (const team of data){
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${team["Team"]}</td>
+            <td>${team["Players"]}</td>
+            <td>${team["Total G"]}</td>
+            <td>${team["Avg MP"].toFixed(0)}</td>
+            <td>${team["Avg PER"].toFixed(1)}</td>
+            <td>${team["Avg TS%"].toFixed(3)}</td>
+            <td>${team["Avg USG%"].toFixed(1)}</td>
+            <td>${team["Total WS"]}</td>
+            <td>${team["Avg WS/48"].toFixed(3)}</td>
+            <td>${team["Avg BPM"].toFixed(1)}</td>
+            <td>${team["Total VORP"]}</td>
+          `;
+          tableBody.appendChild(row);
+        }
+      }
+      renderTeamTable(teamSummary);
 
-      let sortDirection = {};
+      let playerSortDirection
+      let teamSortDirection = {};
 
-      function sortTable(key) {
+      //Sort Table Functions
+      function sortPlayerTable(key) {
         sortDirection[key] = !sortDirection[key]; // flip true/false each click
         const sorted = [...playerStats].sort((a, b) => {
-          if (sortDirection[key]) {
+          if (playerSortDirection[key]) {
             return a[key] > b[key] ? 1 : -1;
           } else {
             return a[key] < b[key] ? 1 : -1;
           }
         });
-        renderTable(sorted);
+        renderPlayerTable(sorted);
       }
 
+      function sortTeamTable(key) {
+        sortDirection[key] = !sortDirection[key]; // flip true/false each click
+        const sorted = [...teamSummary].sort((a, b) => {
+          if (teamSortDirection[key]) {
+            return a[key] > b[key] ? 1 : -1;
+          } else {
+            return a[key] < b[key] ? 1 : -1;
+          }
+        });
+        renderTeamTable(sorted);
+      }
+
+      //Show Tab Function
       function showTab(tabId){
         const panels = document.querySelectorAll(".tab-panel");
         for (const panel of panels){
@@ -95,6 +174,61 @@
       }
 
       showTab("team-analytics");
+
+      //Render Scatter Function 
+      function renderScatter(xKey, yKey){
+        const svg = document.getElementById("team-scatter");
+        svg.innerHTML =""; //clears old circle
+
+        const margin = 40;
+        const width = 600;
+        const height = 400;
+
+        const xValues = teamSummary.map(t => t[xKey]);
+        const yValues = teamSummary.map(t => t[yKey]);
+        const xMin = Math.min(...xValues);
+        const xMax = Math.max(...xValues);
+        const yMin = Math.min(...yValues);
+        const yMax = Math.max(...yValues);
+
+        function scaleX(value){
+          return margin +((value - xMin) / (xMax - xMin)) * (width - 2 * margin);
+        }
+
+        function scaleY(value) {
+          // inverted
+          return height - margin - ((value - yMin) / (yMax - yMin)) * (height - 2 * margin);
+        }
+
+        const svgNS = "http://www.w3.org/2000/svg";
+
+        for (const team of teamSummary) {
+          const cx = scaleX(team[xKey]);
+          const cy = scaleY(team[yKey]);
+
+          const circle = document.createElementNS(svgNS, "circle");
+          circle.setAttribute("cx", cx);
+          circle.setAttribute("cy", cy);
+          circle.setAttribute("r", 5);
+          circle.setAttribute("fill", "steelblue");
+          svg.appendChild(circle);
+
+          const label = document.createElementNS(svgNS, "text");
+          label.setAttribute("x", cx + 6);
+          label.setAttribute("y", cy);
+          label.setAttribute("font-size", "10");
+          label.textContent = team.Team;
+          svg.appendChild(label);
+        }
+      }
+
+      function updateScatter(){
+        const xKey = document.getElementById("x-axis-select").value;
+        const yKey = document.getElementById("y-axis-select").value;
+        renderScatter(xKey, yKey);
+      }
+
+      updateScatter();
   </script>
 </body>
 </html>
