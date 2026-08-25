@@ -180,7 +180,7 @@
         const svg = document.getElementById("team-scatter");
         svg.innerHTML =""; //clears old circle
 
-        const margin = 40;
+        const margin = 55;
         const width = 600;
         const height = 400;
 
@@ -200,8 +200,81 @@
           return height - margin - ((value - yMin) / (yMax - yMin)) * (height - 2 * margin);
         }
 
+        function getTicks(min, max, count){
+          const step = (max - min) / (count - 1);
+          const ticks = [];
+          for (let i = 0; i < count; i++){
+            ticks.push(min+step*i);
+          }
+          return ticks
+        }
+
         const svgNS = "http://www.w3.org/2000/svg";
 
+        //Y-axis gridlines + tick labels
+        const yTicks = getTicks(yMin, yMax, 5);
+        for (const tick of yTicks){
+          const y = scaleY(tick);
+
+          const gridline = document.createElementNS(svgNS, "line");
+          gridline.setAttribute("x1", margin);
+          gridline.setAttribute("x2", width - margin);
+          gridline.setAttribute("y1", y);
+          gridline.setAttribute("y2", y);
+          gridline.setAttribute("stroke", "#ddd");
+          svg.appendChild(gridline);
+
+          const label = document.createElementNS(svgNS, "text");
+          label.setAttribute("x", margin - 8);
+          label.setAttribute("y", y);
+          label.setAttribute("font-size", "10");
+          label.setAttribute("text-anchor", "end");
+          label.setAttribute("dominant-baseline", "middle");
+          label.textContent = tick.toFixed(1);
+          svg.appendChild(label);
+        }
+
+        // Y-axis title, rotated to read vertically
+        const yTitle = document.createElementNS(svgNS, "text");
+        yTitle.setAttribute("x", 12);
+        yTitle.setAttribute("y", height / 2);
+        yTitle.setAttribute("font-size", "11");
+        yTitle.setAttribute("text-anchor", "middle");
+        yTitle.setAttribute("transform", `rotate(-90 12 ${height / 2})`);
+        yTitle.textContent = yKey;
+        svg.appendChild(yTitle);
+
+        //X-axis gridlines + tick lines
+        const xTicks = getTicks(xMin, xMax, 5);
+        for (const tick of xTicks){
+          const x = scaleX(tick);
+
+          const gridline = document.createElementNS(svgNS, "line");
+          gridline.setAttribute("x1", x);
+          gridline.setAttribute("x2", x);
+          gridline.setAttribute("y1", margin);
+          gridline.setAttribute("y2", height - margin);
+          gridline.setAttribute("stroke", "#ddd");
+          svg.appendChild(gridline);
+
+          const label = document.createElementNS(svgNS, "text");
+          label.setAttribute("x", x);
+          label.setAttribute("y", height - margin + 15);
+          label.setAttribute("font-size", "10");
+          label.setAttribute("text-anchor", "middle");
+          label.textContent = tick.toFixed(1);
+          svg.appendChild(label);
+        }
+
+        //X-Axis Titles
+        const xTitle = document.createElementNS(svgNS, "text");
+        xTitle.setAttribute("x", width/2);
+        xTitle.setAttribute("y", height - 5);
+        xTitle.setAttribute("font-size", "11");
+        xTitle.setAttribute("text-anchor", "middle");
+        xTitle.textContent = xKey;
+        svg.appendChild(xTitle);
+        
         for (const team of teamSummary) {
           const cx = scaleX(team[xKey]);
           const cy = scaleY(team[yKey]);
