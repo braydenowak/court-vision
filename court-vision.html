@@ -5,6 +5,7 @@
   <title>Court Vision</title>
 </head>
 <body>
+  <!-- Tabs -->
   <div id="tab-buttons">
     <button onclick="showTab('team-analytics')">Team Analytics</button>
     <button onclick="showTab('player-comparison')">Player Comparison</button>
@@ -393,7 +394,9 @@
             select.appendChild(option);
           }
 
-          select.value = currentValue;
+          if (currentValue) {
+            select.value = currentValue;
+          }
         }
       }
 
@@ -523,6 +526,31 @@
         updateRadarChart();
       }
 
+      //Roster Lab Stuff
+
+      function buildCurrentTeamMap() {
+        const currentTeam = {};
+        const minGames = {};
+
+        for (const row of teamStints) {
+          const isCombinedRow = row.Team.endsWith("TM");
+          if (isCombinedRow) continue;
+
+          const id = row["Player ID"];
+          if (!(id in minGames) || row.G < minGames[id]) {
+            minGames[id] = row.G;
+            currentTeam[id] = row.Team;
+          }
+        }
+        return currentTeam;
+      }
+      const currentTeamMap = buildCurrentTeamMap();
+      
+      for (const player of playerStats){
+        player.currentTeam = currentTeamMap[player["Player ID"]] || player.Team;
+      }
+
+      console.log(playerStats.find(p => p.Player === "James Harden"));
   </script>
 </body>
 </html>
