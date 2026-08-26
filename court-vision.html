@@ -72,6 +72,12 @@
   <!-- Player Comparison Panel-->
   <div id="player-comparison" class="tab-panel">
     <h1>Court Vision</h1>
+    <div id="player-selectors">
+      <select id="player-select-1" onchange="handlePlayerSelectionChange()"></select>
+      <select id="player-select-2" onchange="handlePlayerSelectionChange()"></select>
+      <select id="player-select-3" onchange="handlePlayerSelectionChange()"></select>
+    </div>
+    <svg id="radar-chart" viewBox="0 0 500 500" width="500" height="500"></svg>
     <table id = "player-table">
       <thead>
         <tr>
@@ -100,7 +106,6 @@
   <script src="team_stints.js"></script>
   <script src="team_summary.js"></script>
   <script>
-      console.log(playerStats.length,teamStints.length, teamSummary.length);
       //Render Table Functions
       function renderPlayerTable(data) {
         const tableBody = document.getElementById("player-table-body");
@@ -364,6 +369,159 @@
       }
 
       updateRankingChart();
+
+      //Player Selector for Radar Chart
+      function populatePlayerSelectors(){
+        const selectIds = ["player-select-1", "player-select-2", "player-select-3"];
+        for (const id of selectIds){
+          const select = document.getElementById(id);
+          const currentValue = select.value;
+
+          const otherValues = selectIds
+            .filter(otherId => otherId !== id)
+            .map(otherId => document.getElementById(otherId).value);
+
+          select.innerHTML = "";
+
+          for(const player of playerStats){
+            if (otherValues.includes(player["Player ID"])){
+              continue;
+            }
+            const option = document.createElement("option");
+            option.value = player["Player ID"];
+            option.textContent = player.Player;
+            select.appendChild(option);
+          }
+
+          select.value = currentValue;
+        }
+      }
+
+      populatePlayerSelectors();
+
+
+      function getSelectedPlayers(){
+        const selectIds = ["player-select-1", "player-select-2", "player-select-3"];
+        const selectedPlayers = [];
+        for (const id of selectIds){
+          const selectedId = document.getElementById(id).value;
+          const match = playerStats.find(p => p["Player ID"] === selectedId);
+          selectedPlayers.push(match);
+        }
+        return selectedPlayers
+      }
+      
+
+      const radarStats = ["PER", "TS%", "TRB%", "AST%", "USG%", "WS/48", "BPM"];
+      
+      //Percentiles
+      function getPercentile(key, value){
+        const allValues = playerStats.map(p=> p[key]);
+        const countBelowOrEqual = allValues.filter(v => v <= value).length;
+        return (countBelowOrEqual / allValues.length) * 100;
+      }
+
+      
+      function getPlayerPercentiles(player){
+        const result = {};
+        for(const stat of radarStats){
+            result[stat] = getPercentile(stat, player[stat])
+          }
+          return result;
+      }
+
+      //Drawing Radar Chart
+      function getRadarPoint(index, total, percent, radius, cx, cy){
+        const angle = (index / total) * 2 * Math.PI -Math.PI / 2;
+        const r = (percent /100 ) * radius;
+        return{
+          x: cx + r * Math.cos(angle),
+          y: cy + r * Math.sin(angle)
+        }
+      }
+
+      function renderRadarBackground() {
+        const svg = document.getElementById("radar-chart");
+        svg.innerHTML = "";
+        const svgNS = "http://www.w3.org/2000/svg";
+        const cx = 250, cy = 250, radius = 180;
+        const total = radarStats.length;
+
+        const ringLevels = [25, 50, 75, 100];
+        for (const level of ringLevels) {
+          let points = "";
+          for (let i = 0; i < total; i++) {
+            const p = getRadarPoint(i, total, level, radius, cx, cy);
+            points += `${p.x},${p.y} `;
+          }
+          const ring = document.createElementNS(svgNS, "polygon");
+          ring.setAttribute("points", points.trim());
+          ring.setAttribute("fill", "none");
+          ring.setAttribute("stroke", "#ddd");
+          svg.appendChild(ring);
+        }
+
+        for (let i = 0; i < total; i++) {
+          const outer = getRadarPoint(i, total, 100, radius, cx, cy);
+          const spoke = document.createElementNS(svgNS, "line");
+          spoke.setAttribute("x1", cx);
+          spoke.setAttribute("y1", cy);
+          spoke.setAttribute("x2", outer.x);
+          spoke.setAttribute("y2", outer.y);
+          spoke.setAttribute("stroke", "#ccc");
+          svg.appendChild(spoke);
+
+          const labelPoint = getRadarPoint(i, total, 115, radius, cx, cy);
+          const label = document.createElementNS(svgNS, "text");
+          label.setAttribute("x", labelPoint.x);
+          label.setAttribute("y", labelPoint.y);
+          label.setAttribute("font-size", "11");
+          label.setAttribute("text-anchor", "middle");
+          label.textContent = radarStats[i];
+          svg.appendChild(label);
+        }
+      }
+      
+      
+      function renderPlayerPolygon(player, color){
+        const svg = document.getElementById("radar-chart");
+        const svgNS = "http://www.w3.org/2000/svg";
+        const cx = 250, cy = 250, radius = 180;
+        const total = radarStats.length;
+
+        const percentiles = getPlayerPercentiles(player);
+
+        let points = "";
+          
+        for (let i = 0; i < total; i++) {
+          const percent = percentiles[radarStats[i]]
+          const p = getRadarPoint(i, total, percent, radius, cx, cy);
+          points += `${p.x},${p.y} `;
+        }
+        const polygon = document.createElementNS(svgNS, "polygon");
+        polygon.setAttribute("points", points.trim());
+        polygon.setAttribute("fill", color);
+        polygon.setAttribute("fill-opacity", "0.3");
+        polygon.setAttribute("stroke", color);
+        svg.appendChild(polygon);
+      }
+
+      
+      //Connecting Dropdowns to chart
+      const polygonColors = ["steelblue", "darkorange", "seagreen"];
+      function updateRadarChart(){
+        renderRadarBackground();
+        const players = getSelectedPlayers();
+        for(let i = 0; i < polygonColors.length; i++){
+          renderPlayerPolygon(players[i],polygonColors[i]);
+        }
+      }
+      updateRadarChart();
+
+      function handlePlayerSelectionChange() {
+        populatePlayerSelectors();
+        updateRadarChart();
+      }
 
   </script>
 </body>
