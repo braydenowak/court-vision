@@ -100,7 +100,8 @@
 
   <!-- Roster Lab Panel-->
   <div id="roster-lab" class="tab-panel">
-    <p>Roster Lab — coming soon.</p>
+    <select id="team-select" onchange="updateRoster()"></select>
+    <dic id="roster-list"></dic>
   </div>
 
   <script src="player_stats.js"></script>
@@ -526,8 +527,9 @@
         updateRadarChart();
       }
 
-      //Roster Lab Stuff
+      //****** Roster Lab Stuff *******
 
+      // Figures out the current teams for multi team players
       function buildCurrentTeamMap() {
         const currentTeam = {};
         const minGames = {};
@@ -545,12 +547,44 @@
         return currentTeam;
       }
       const currentTeamMap = buildCurrentTeamMap();
-      
+
+      //applys buildCurrentTeamMap to all players so we can use playerStats
       for (const player of playerStats){
         player.currentTeam = currentTeamMap[player["Player ID"]] || player.Team;
       }
 
-      console.log(playerStats.find(p => p.Player === "James Harden"));
+      //populates the tabs for team select
+      function populateTeamSelector(){
+        const select = document.getElementById("team-select");
+        select.innerHTML = "";
+
+        for(const team of teamSummary){
+          const option = document.createElement("option");
+          option.value = team.Team;
+          option.textContent = team.Team;
+          select.appendChild(option);
+        }
+      }
+      populateTeamSelector();
+
+      //Renders the Roster
+      function renderRoster(teamCode){
+        const container = document.getElementById("roster-list");
+        container.innerHTML="";
+
+        const roster = playerStats.filter(player => player.currentTeam === teamCode);
+        for (const player of roster){
+          const row = document.createElement("div");
+          row.textContent = `${player.Player} - ${player.Pos} - PER ${player.PER}`;
+          container.appendChild(row);
+        }
+      }
+
+      function updateRoster() {
+        const teamCode = document.getElementById("team-select").value;
+        renderRoster(teamCode);
+      }
+      updateRoster(); 
   </script>
 </body>
 </html>
