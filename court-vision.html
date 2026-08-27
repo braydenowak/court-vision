@@ -104,6 +104,7 @@
   <!-- Roster Lab Panel-->
   <div id="roster-lab" class="tab-panel">
     <select id="team-select" onchange="handleTeamChange()"></select>
+    <button onclick="resetRoster()">Reset to current roster</button>
     <div id="team-fingerprint"></div>
     <div id="removed-chips"></div>
     <div id="roster-list"></div>
@@ -740,6 +741,12 @@
           counts[player.Pos]++;
         }
         return counts;
+      }
+
+      //Resests the roster
+      function resetRoster(){
+        removedPlayerIds = [];
+        updateRoster();
       }
   </script>
 </body>
