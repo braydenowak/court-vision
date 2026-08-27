@@ -48,6 +48,7 @@
           <option value="Avg TS%">Avg TS%</option>
           <option value="Avg USG%">Avg USG%</option>
           <option value="Avg WS/48">Avg WS/48</option>
+          <option value="Avg BPM">Avg BPM</option>
           <option value="Total VORP">Total VORP</option>
         </select>
       </label>
@@ -224,6 +225,7 @@
         const yMin = Math.min(...yValues);
         const yMax = Math.max(...yValues);
 
+
         function scaleX(value){
           return margin +((value - xMin) / (xMax - xMin)) * (width - 2 * margin);
         }
@@ -349,16 +351,35 @@
         svg.setAttribute("height", height);
 
         const sorted = [...teamSummary].sort((a,b) => b[key] - a[key]);
-        const maxVal = Math.max(...sorted.map(t => t[key]));
+        const minVal = Math.min(...sorted.map(t => t[key]), 0);
+        const maxVal = Math.max(...sorted.map(t => t[key]), 0);
         const svgNS = "http://www.w3.org/2000/svg";
         
+        function scaleValue(value) {
+          return margin + ((value - minVal) / (maxVal - minVal)) * (width - margin - 20);
+        }
+
+        //Zero reference Line
+        const line = document.createElementNS(svgNS, "line");
+        line.setAttribute("x1", scaleValue(0));
+        line.setAttribute("x2", scaleValue(0));
+        line.setAttribute("y1", 0);
+        line.setAttribute("y2", height-24);
+        line.setAttribute("stroke", "#667");
+        line.setAttribute("stroke-width", "2")
+        svg.appendChild(line);
+
         sorted.forEach((team, i) => {
           const y = i *rowHeight;
-          const barWidth = (team[key] / maxVal) * (width - margin - 20);
+          const zeroX = scaleValue(0);
+          const valueX = scaleValue(team[key]);
+          const barX = Math.min(zeroX, valueX);
+          const barWidth = Math.abs(zeroX - valueX);
 
+          
           //Bar
           const bar = document.createElementNS(svgNS, "rect");
-          bar.setAttribute("x", margin);
+          bar.setAttribute("x", barX);
           bar.setAttribute("y", y);
           bar.setAttribute("width", barWidth);
           bar.setAttribute("height", rowHeight - 4);
