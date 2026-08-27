@@ -105,6 +105,8 @@
   <div id="roster-lab" class="tab-panel">
     <select id="team-select" onchange="handleTeamChange()"></select>
     <button onclick="resetRoster()">Reset to current roster</button>
+    <select id="add-player-select"></select>
+    <button onclick="addPlayerToRoster()">Add to roster</button>
     <div id="team-fingerprint"></div>
     <div id="removed-chips"></div>
     <div id="roster-list"></div>
@@ -115,7 +117,9 @@
   <script src="team_stints.js"></script>
   <script src="team_summary.js"></script>
   <script>
+      //Arrays for added and remove players
       let removedPlayerIds = [];
+      let addedPlayerIds = [];
 
       //Render Table Functions
       function renderPlayerTable(data) {
@@ -593,6 +597,7 @@
         const roster = getHypotheticalRoster(teamCode);
         renderChips(teamCode);
         renderPositionMix(teamCode);
+        populateAddPlayerSelector(teamCode)
         renderRoster(roster);
         renderFingerprint(computeFingerprint(roster));
         
@@ -637,7 +642,9 @@
       //pulls the Hypo-Roster
       function getHypotheticalRoster(teamCode) {
         const realRoster = playerStats.filter(p => p.currentTeam === teamCode);
-        return realRoster.filter(p => !removedPlayerIds.includes(p["Player ID"]));
+        const kept = realRoster.filter(p => !removedPlayerIds.includes(p["Player ID"]));
+        const added = playerStats.filter(p => addedPlayerIds.includes(p["Player ID"]));
+        return [...kept, ...added];
       }
       //removes players from roster
       function removePlayer(id){
@@ -648,6 +655,7 @@
       
       function handleTeamChange() {
         removedPlayerIds = [];
+        addedPlayerIds = [];
         updateRoster();
       }
 
@@ -746,6 +754,33 @@
       //Resests the roster
       function resetRoster(){
         removedPlayerIds = [];
+        addedPlayerIds = [];
+        updateRoster();
+      }
+
+      //fills the Add player selectors
+      function populateAddPlayerSelector(teamCode) {
+        const select = document.getElementById("add-player-select");
+        select.innerHTML = "";
+
+        const currentRoster = getHypotheticalRoster(teamCode);
+        const currentRosterIds = currentRoster.map(p => p["Player ID"]);
+
+        for (const player of playerStats) {
+          if (currentRosterIds.includes(player["Player ID"])) {
+            continue;
+          }
+          const option = document.createElement("option");
+          option.value = player["Player ID"];
+          option.textContent = player.Player;
+          select.appendChild(option);
+        }
+      }
+
+      //Pushes player to roster
+      function addPlayerToRoster() {
+        const id = document.getElementById("add-player-select").value;
+        addedPlayerIds.push(id);
         updateRoster();
       }
   </script>
