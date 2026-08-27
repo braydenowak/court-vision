@@ -15,40 +15,43 @@
   <!-- Team Analytics Panel-->
   <div id="team-analytics" class="tab-panel">
     <h1>Court Vision</h1>
+    <div id="skatter-axis">
+      <label>X axis:
+        <select id="x-axis-select" onchange="updateScatter()">
+          <option value="Avg PER" selected>Avg PER</option>
+          <option value="Avg TS%">Avg TS%</option>
+          <option value="Avg USG%">Avg USG%</option>
+          <option value="Avg WS/48">Avg WS/48</option>
+          <option value="Avg BPM">Avg BPM</option>
+          <option value="Total VORP">Total VORP</option>
+        </select>
+      </label>
 
-    <label>X axis:
-      <select id="x-axis-select" onchange="updateScatter()">
-        <option value="Avg PER" selected>Avg PER</option>
-        <option value="Avg TS%">Avg TS%</option>
-        <option value="Avg USG%">Avg USG%</option>
-        <option value="Avg WS/48">Avg WS/48</option>
-        <option value="Avg BPM">Avg BPM</option>
-        <option value="Total VORP">Total VORP</option>
-      </select>
-    </label>
-
-    <label>Y axis:
-      <select id="y-axis-select" onchange="updateScatter()">
-        <option value="Avg PER">Avg PER</option>
-        <option value="Avg TS%">Avg TS%</option>
-        <option value="Avg USG%">Avg USG%</option>
-        <option value="Avg WS/48">Avg WS/48</option>
-        <option value="Avg BPM">Avg BPM</option>
-        <option value="Total VORP" selected>Total VORP</option>
-      </select>
-    </label>
-
-    <label>Metric:
-      <select id="metric-select" onchange="updateRankingChart()">
-        <option value="Avg PER" selected>Avg PER</option>
-        <option value="Avg TS%">Avg TS%</option>
-        <option value="Avg USG%">Avg USG%</option>
-        <option value="Avg WS/48">Avg WS/48</option>
-        <option value="Total VORP">Total VORP</option>
-      </select>
-    </label>
+      <label>Y axis:
+        <select id="y-axis-select" onchange="updateScatter()">
+          <option value="Avg PER">Avg PER</option>
+          <option value="Avg TS%">Avg TS%</option>
+          <option value="Avg USG%">Avg USG%</option>
+          <option value="Avg WS/48">Avg WS/48</option>
+          <option value="Avg BPM">Avg BPM</option>
+          <option value="Total VORP" selected>Total VORP</option>
+        </select>
+      </label>
+    </div>
+    
 
     <svg id="team-scatter" viewBox="0 0 600 400" width="600" height="400"></svg>
+    <div id="metric-dropdown">
+      <label>Metric:
+        <select id="metric-select" onchange="updateRankingChart()">
+          <option value="Avg PER" selected>Avg PER</option>
+          <option value="Avg TS%">Avg TS%</option>
+          <option value="Avg USG%">Avg USG%</option>
+          <option value="Avg WS/48">Avg WS/48</option>
+          <option value="Total VORP">Total VORP</option>
+        </select>
+      </label>
+    </div>
     <svg id="ranking-chart" width="600"></svg>
     <table id="team-table">
       <thead>
@@ -101,7 +104,8 @@
   <!-- Roster Lab Panel-->
   <div id="roster-lab" class="tab-panel">
     <select id="team-select" onchange="updateRoster()"></select>
-    <dic id="roster-list"></dic>
+    <div id="team-fingerprint"></div>
+    <div id="roster-list"></div>
   </div>
 
   <script src="player_stats.js"></script>
@@ -568,11 +572,10 @@
       populateTeamSelector();
 
       //Renders the Roster
-      function renderRoster(teamCode){
+      function renderRoster(roster){
         const container = document.getElementById("roster-list");
         container.innerHTML="";
 
-        const roster = playerStats.filter(player => player.currentTeam === teamCode);
         for (const player of roster){
           const row = document.createElement("div");
           row.textContent = `${player.Player} - ${player.Pos} - PER ${player.PER}`;
@@ -582,9 +585,46 @@
 
       function updateRoster() {
         const teamCode = document.getElementById("team-select").value;
-        renderRoster(teamCode);
+        const roster = playerStats.filter(player => player.currentTeam === teamCode);
+        renderRoster(roster);
+        renderFingerprint(computeFingerprint(roster));
       }
       updateRoster(); 
+
+      //Reduce functions
+      function average(arr) {
+        return arr.reduce((sum, val) => sum + val, 0) / arr.length;
+      }
+      function total(arr) {
+        return arr.reduce((sum, val) => sum + val, 0);
+      }
+
+      //Computes the fingerprint
+      function computeFingerprint(roster){
+        return [
+          { label: "Players", value: roster.length, decimals: 0},
+          { label: "Avg PER", value: average(roster.map(p => p.PER)), decimals: 1},
+          { label: "Avg TS%", value: average(roster.map(p => p["TS%"])), decimals: 3},
+          { label: "Avg USG%", value: average(roster.map(p => p["USG%"])), decimals: 1},
+          { label: "Total WS", value: total(roster.map(p => p.WS)), decimals: 1},
+          { label: "Avg WS/48", value: average(roster.map(p => p["WS/48"])), decimals: 3},
+          { label: "Avg BPM", value: average(roster.map(p => p.BPM)), decimals: 1},
+          { label: "Total VORP", value: total(roster.map(p => p.VORP)), decimals: 1}
+        ]
+      }
+
+      //Renders Fingerprint
+      function renderFingerprint(tiles){
+        const container = document.getElementById("team-fingerprint");
+        container.innerHTML="";
+
+        for (const tile of tiles){
+          const div = document.createElement("div");
+          div.textContent = `${tile.label}: ${tile.value.toFixed(tile.decimals)}`;
+          container.appendChild(div);
+        }
+      }
+      
   </script>
 </body>
 </html>
