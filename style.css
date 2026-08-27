@@ -1,0 +1,67 @@
+:root {
+    --ink: #1C1C1A;
+    --ink-muted: #6B6B66;
+    --paper: #F5F4F0;
+    --surface: #FFFFFF;
+    --border: #D9D7D0;
+    --accent-primary: #3B6E8F;
+    --accent-compare: #D2691E;
+    --accent-tertiary: #2E8B57;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+margin: 0;
+font-family: 'Public Sans', sans-serif;
+color: var(--ink);
+background-color: var(--paper);
+padding: 24px;
+}
+
+header {
+    margin-bottom: 24px;
+  }
+  
+  h1 {
+    font-family: 'Abril Fatface', serif;
+    font-size: 64px;
+    margin: 0;
+    letter-spacing: 1px;
+  }
+  
+  .tagline {
+    color: var(--ink-muted);
+    margin: 4px 0 0 0;
+  }
+  
+  #tab-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--border);
+  }
+  
+  #tab-buttons button {
+    font-family: 'Public Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 16px;
+    border: none;
+    background: none;
+    color: var(--ink-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+  }
+  
+  #tab-buttons button:hover {
+    color: var(--ink);
+  }
+  
+  #tab-buttons button.active {
+    color: var(--accent-primary);
+    border-bottom: 2px solid var(--accent-primary);
+  }

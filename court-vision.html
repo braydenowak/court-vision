@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Court Vision</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">  <title>Court Vision</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <header>
+    <h1>Court Vision</h1>
+    <p class="tagline">NBA analytics tool</p>
+  </header>
   <!-- Tabs -->
   <div id="tab-buttons">
-    <button onclick="showTab('team-analytics')">Team Analytics</button>
-    <button onclick="showTab('player-comparison')">Player Comparison</button>
-    <button onclick="showTab('roster-lab')">Roster Lab</button>
+    <button onclick="showTab('team-analytics', this)">Team Analytics</button>
+    <button onclick="showTab('player-comparison', this)">Player Comparison</button>
+    <button onclick="showTab('roster-lab', this)">Roster Lab</button>
   </div>
 
   <!-- Team Analytics Panel-->
   <div id="team-analytics" class="tab-panel">
-    <h1>Court Vision</h1>
     <div id="skatter-axis">
       <label>X axis:
         <select id="x-axis-select" onchange="updateScatter()">
@@ -76,7 +81,6 @@
 
   <!-- Player Comparison Panel-->
   <div id="player-comparison" class="tab-panel">
-    <h1>Court Vision</h1>
     <div id="player-selectors">
       <select id="player-select-1" onchange="handlePlayerSelectionChange()"></select>
       <select id="player-select-2" onchange="handlePlayerSelectionChange()"></select>
@@ -199,15 +203,22 @@
       }
 
       //Show Tab Function
-      function showTab(tabId){
+      function showTab(tabId, clickedButton){
         const panels = document.querySelectorAll(".tab-panel");
         for (const panel of panels){
           panel.style.display = "none";
         }
         document.getElementById(tabId).style.display = "block";
+
+        const buttons = document.querySelectorAll("#tab-buttons button");
+        for (const button of buttons){
+          button.classList.remove("active");
+        }
+        clickedButton.classList.add("active");
       }
 
-      showTab("team-analytics");
+      const firstButton = document.querySelector("#tab-buttons button");
+      showTab("team-analytics", firstButton);
 
       //Render Team Scatter Function 
       function renderScatter(xKey, yKey){
@@ -808,6 +819,8 @@
         addedPlayerIds.push(id);
         updateRoster();
       }
+  
+    
   </script>
 </body>
 </html>
