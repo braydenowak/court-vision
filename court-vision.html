@@ -648,7 +648,11 @@
       }
       //removes players from roster
       function removePlayer(id){
-        removedPlayerIds.push(id);
+        if (addedPlayerIds.includes(id)) {
+          addedPlayerIds = addedPlayerIds.filter(p => p != id);
+        } else {
+          removedPlayerIds.push(id);
+        }
         updateRoster();
       }
 
