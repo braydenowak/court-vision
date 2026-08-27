@@ -81,10 +81,17 @@
 
   <!-- Player Comparison Panel-->
   <div id="player-comparison" class="tab-panel">
-    <div id="player-selectors">
-      <select id="player-select-1" onchange="handlePlayerSelectionChange()"></select>
-      <select id="player-select-2" onchange="handlePlayerSelectionChange()"></select>
-      <select id="player-select-3" onchange="handlePlayerSelectionChange()"></select>
+    <div class="player-search-wrapper">
+      <input type="text" id="player-search-1" placeholder="Search player..." autocomplete="off">
+      <div id="player-suggestions-1" class="suggestions"></div>
+    </div>
+    <div class="player-search-wrapper">
+      <input type="text" id="player-search-2" placeholder="Search player..." autocomplete="off">
+      <div id="player-suggestions-2" class="suggestions"></div>
+    </div>
+    <div class="player-search-wrapper">
+      <input type="text" id="player-search-3" placeholder="Search player..." autocomplete="off">
+      <div id="player-suggestions-3" class="suggestions"></div>
     </div>
     <svg id="radar-chart" viewBox="0 0 500 500" width="500" height="500"></svg>
     <table id = "player-table">
@@ -110,8 +117,10 @@
   <div id="roster-lab" class="tab-panel">
     <select id="team-select" onchange="handleTeamChange()"></select>
     <button onclick="resetRoster()">Reset to current roster</button>
-    <select id="add-player-select"></select>
-    <button onclick="addPlayerToRoster()">Add to roster</button>
+    <div class="player-search-wrapper">
+      <input type="text" id="add-player-search" placeholder="Search player to add..." autocomplete="off">
+      <div id="add-player-suggestions" class="suggestions"></div>
+    </div>
     <div id="team-fingerprint"></div>
     <div id="removed-chips"></div>
     <div id="roster-list"></div>
@@ -417,49 +426,6 @@
 
       updateRankingChart();
 
-      //Player Selector for Radar Chart
-      function populatePlayerSelectors(){
-        const selectIds = ["player-select-1", "player-select-2", "player-select-3"];
-        for (const id of selectIds){
-          const select = document.getElementById(id);
-          const currentValue = select.value;
-
-          const otherValues = selectIds
-            .filter(otherId => otherId !== id)
-            .map(otherId => document.getElementById(otherId).value);
-
-          select.innerHTML = "";
-
-          for(const player of playerStats){
-            if (otherValues.includes(player["Player ID"])){
-              continue;
-            }
-            const option = document.createElement("option");
-            option.value = player["Player ID"];
-            option.textContent = player.Player;
-            select.appendChild(option);
-          }
-
-          if (currentValue) {
-            select.value = currentValue;
-          }
-        }
-      }
-
-      populatePlayerSelectors();
-
-
-      function getSelectedPlayers(){
-        const selectIds = ["player-select-1", "player-select-2", "player-select-3"];
-        const selectedPlayers = [];
-        for (const id of selectIds){
-          const selectedId = document.getElementById(id).value;
-          const match = playerStats.find(p => p["Player ID"] === selectedId);
-          selectedPlayers.push(match);
-        }
-        return selectedPlayers
-      }
-      
 
       const radarStats = ["PER", "TS%", "TRB%", "AST%", "USG%", "WS/48", "BPM"];
       
@@ -565,12 +531,6 @@
           renderPlayerPolygon(players[i],polygonColors[i]);
         }
       }
-      updateRadarChart();
-
-      function handlePlayerSelectionChange() {
-        populatePlayerSelectors();
-        updateRadarChart();
-      }
 
       //****** Roster Lab Stuff *******
 
@@ -629,7 +589,7 @@
         const roster = getHypotheticalRoster(teamCode);
         renderChips(teamCode);
         renderPositionMix(teamCode);
-        populateAddPlayerSelector(teamCode)
+      
         renderRoster(roster);
         renderFingerprint(computeFingerprint(roster));
         
@@ -665,7 +625,11 @@
 
         for (const tile of tiles){
           const div = document.createElement("div");
-          div.textContent = `${tile.label}: ${tile.value.toFixed(tile.decimals)}`;
+          div.className = "stat-tile";
+          div.innerHTML = `
+            <div class="stat-value">${tile.value.toFixed(tile.decimals)}</div>
+            <div class="stat-label">${tile.label}</div>
+          `;
           container.appendChild(div);
         }
       }
@@ -794,33 +758,107 @@
         updateRoster();
       }
 
-      //fills the Add player selectors
-      function populateAddPlayerSelector(teamCode) {
-        const select = document.getElementById("add-player-select");
-        select.innerHTML = "";
-
+      //fills the player search
+      function getAddPlayerSearchCandidates() {
+        const teamCode = document.getElementById("team-select").value;
         const currentRoster = getHypotheticalRoster(teamCode);
         const currentRosterIds = currentRoster.map(p => p["Player ID"]);
+        return playerStats.filter(p => !currentRosterIds.includes(p["Player ID"]));
+      }
 
-        for (const player of playerStats) {
-          if (currentRosterIds.includes(player["Player ID"])) {
-            continue;
-          }
-          const option = document.createElement("option");
-          option.value = player["Player ID"];
-          option.textContent = player.Player;
-          select.appendChild(option);
+      setupPlayerSearch(
+        "add-player-search",
+        "add-player-suggestions",
+        getAddPlayerSearchCandidates,
+        (player) => {
+          addedPlayerIds.push(player["Player ID"]);
+          document.getElementById("add-player-search").value = "";
+          updateRoster();
         }
-      }
-
-      //Pushes player to roster
-      function addPlayerToRoster() {
-        const id = document.getElementById("add-player-select").value;
-        addedPlayerIds.push(id);
-        updateRoster();
-      }
+      );
+      
   
-    
+    //Search bar functions
+    function setupPlayerSearch(inputId, suggestionsId, getCandidates, onSelect) {
+      const input = document.getElementById(inputId);
+      const suggestionsBox = document.getElementById(suggestionsId);
+
+      input.addEventListener("input", () => {
+        const query = input.value.toLowerCase();
+        suggestionsBox.innerHTML = "";
+        if (query.length === 0) return;
+
+        const candidates = getCandidates();
+        const matches = candidates
+          .filter(p => p.Player.toLowerCase().includes(query))
+          .slice(0, 8);
+
+        for (const player of matches) {
+          const item = document.createElement("div");
+          item.className = "suggestion-item";
+          item.textContent = player.Player;
+          item.onclick = () => {
+            input.value = player.Player;
+            input.dataset.selectedId = player["Player ID"];
+            suggestionsBox.innerHTML = "";
+            onSelect(player);
+          };
+          suggestionsBox.appendChild(item);
+        }
+      });
+    }
+
+    function getPlayerSearchCandidates(excludeInputIds) {
+      const excludedIds = excludeInputIds
+        .map(id => document.getElementById(id).dataset.selectedId)
+        .filter(id => id);
+      return playerStats.filter(p => !excludedIds.includes(p["Player ID"]));
+    }
+
+    //Sets up default searches for radar chart
+    const input1 = document.getElementById("player-search-1");
+    const input2 = document.getElementById("player-search-2");
+    const input3 = document.getElementById("player-search-3");
+    input1.value = playerStats[0].Player;
+    input2.value = playerStats[1].Player;
+    input3.value = playerStats[2].Player;
+    input1.dataset.selectedId = playerStats[0]["Player ID"];
+    input2.dataset.selectedId = playerStats[1]["Player ID"];
+    input3.dataset.selectedId = playerStats[2]["Player ID"];
+
+    updateRadarChart();
+
+    //Sets up player search for each three options in player comparison
+    setupPlayerSearch(
+      "player-search-1",
+      "player-suggestions-1",
+      () => getPlayerSearchCandidates(["player-search-2", "player-search-3"]),
+      (player) => updateRadarChart()
+    );
+    setupPlayerSearch(
+      "player-search-2",
+      "player-suggestions-2",
+      () => getPlayerSearchCandidates(["player-search-1", "player-search-3"]),
+      (player) => updateRadarChart()
+    );
+    setupPlayerSearch(
+      "player-search-3",
+      "player-suggestions-3",
+      () => getPlayerSearchCandidates(["player-search-1", "player-search-2"]),
+      (player) => updateRadarChart()
+    );
+
+    function getSelectedPlayers() {
+      const selectIds = ["player-search-1", "player-search-2", "player-search-3"];
+      const selectedPlayers = [];
+      for (const id of selectIds) {
+        const selectedId = document.getElementById(id).dataset.selectedId;
+        const match = playerStats.find(p => p["Player ID"] === selectedId);
+        selectedPlayers.push(match);
+      }
+      return selectedPlayers;
+    }
+
   </script>
 </body>
 </html>

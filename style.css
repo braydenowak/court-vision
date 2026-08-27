@@ -14,11 +14,11 @@
 }
 
 body {
-margin: 0;
-font-family: 'Public Sans', sans-serif;
-color: var(--ink);
-background-color: var(--paper);
-padding: 24px;
+  margin: 0;
+  font-family: 'Public Sans', sans-serif;
+  color: var(--ink);
+  background-color: var(--paper);
+  padding: 24px;
 }
 
 header {
@@ -91,4 +91,100 @@ header {
 
   tbody tr:nth-child(even) {
     background-color: var(--surface);
+  }
+
+  #team-fingerprint{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-tile {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-family: 'Abril Fatface', serif;
+    font-size: 32px;
+    color: var(--ink);
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+  }
+
+  button {
+    font-family: 'Public Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background-color: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: var(--paper);
+    border-color: var(--ink-muted);
+  }
+  
+  select {
+    font-family: 'Public Sans', sans-serif;
+    font-size: 13px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background-color: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .player-search-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-right: 12px;
+  }
+  
+  .suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    width: 200px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10;
+  }
+  
+  .suggestion-item {
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  
+  .suggestion-item:hover {
+    background-color: var(--paper);
+  }
+
+  #radar-chart {
+    display: block;
+    margin-top: 16px;
+  }
+
+  #team-scatter, #ranking-chart, #position-mix {
+    display: block;
+    margin-top: 16px;
   }
