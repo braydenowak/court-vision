@@ -103,8 +103,9 @@
 
   <!-- Roster Lab Panel-->
   <div id="roster-lab" class="tab-panel">
-    <select id="team-select" onchange="updateRoster()"></select>
+    <select id="team-select" onchange="handleTeamChange()"></select>
     <div id="team-fingerprint"></div>
+    <div id="removed-chips"></div>
     <div id="roster-list"></div>
   </div>
 
@@ -588,6 +589,7 @@
       function updateRoster() {
         const teamCode = document.getElementById("team-select").value;
         const roster = getHypotheticalRoster(teamCode);
+        renderChips(teamCode);
         renderRoster(roster);
         renderFingerprint(computeFingerprint(roster));
       }
@@ -639,6 +641,29 @@
         updateRoster();
       }
 
+      
+      function handleTeamChange() {
+        removedPlayerIds = [];
+        updateRoster();
+      }
+
+      //Renders removed players
+      function renderChips(teamCode){
+        const container = document.getElementById("removed-chips");
+        container.innerHTML="";
+
+        const roster = playerStats.filter(p => p.currentTeam === teamCode && removedPlayerIds.includes(p["Player ID"]));
+        for(const player of roster){
+          const div = document.createElement("div");
+          div.innerHTML = `${player.Player} <button onclick="addBackPlayer('${player["Player ID"]}')">Add Back</button>`;
+          container.appendChild(div);
+        }
+      }
+
+      function addBackPlayer(id){
+        removedPlayerIds = removedPlayerIds.filter(p => p != id);
+        updateRoster();
+      }
       
   </script>
 </body>
