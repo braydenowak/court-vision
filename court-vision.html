@@ -112,6 +112,8 @@
   <script src="team_stints.js"></script>
   <script src="team_summary.js"></script>
   <script>
+      let removedPlayerIds = [];
+
       //Render Table Functions
       function renderPlayerTable(data) {
         const tableBody = document.getElementById("player-table-body");
@@ -578,14 +580,14 @@
 
         for (const player of roster){
           const row = document.createElement("div");
-          row.textContent = `${player.Player} - ${player.Pos} - PER ${player.PER}`;
+          row.innerHTML = `${player.Player} - ${player.Pos} - PER ${player.PER} <button onclick="removePlayer('${player["Player ID"]}')">Remove</button>`;
           container.appendChild(row);
         }
       }
 
       function updateRoster() {
         const teamCode = document.getElementById("team-select").value;
-        const roster = playerStats.filter(player => player.currentTeam === teamCode);
+        const roster = getHypotheticalRoster(teamCode);
         renderRoster(roster);
         renderFingerprint(computeFingerprint(roster));
       }
@@ -624,6 +626,19 @@
           container.appendChild(div);
         }
       }
+      
+      
+      //pulls the Hypo-Roster
+      function getHypotheticalRoster(teamCode) {
+        const realRoster = playerStats.filter(p => p.currentTeam === teamCode);
+        return realRoster.filter(p => !removedPlayerIds.includes(p["Player ID"]));
+      }
+      //removes players from roster
+      function removePlayer(id){
+        removedPlayerIds.push(id);
+        updateRoster();
+      }
+
       
   </script>
 </body>
