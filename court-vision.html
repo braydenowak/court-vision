@@ -107,6 +107,7 @@
     <div id="team-fingerprint"></div>
     <div id="removed-chips"></div>
     <div id="roster-list"></div>
+    <svg id="position-mix" width="500"></svg>
   </div>
 
   <script src="player_stats.js"></script>
@@ -590,8 +591,10 @@
         const teamCode = document.getElementById("team-select").value;
         const roster = getHypotheticalRoster(teamCode);
         renderChips(teamCode);
+        renderPositionMix(teamCode);
         renderRoster(roster);
         renderFingerprint(computeFingerprint(roster));
+        
       }
       updateRoster(); 
 
@@ -664,7 +667,80 @@
         removedPlayerIds = removedPlayerIds.filter(p => p != id);
         updateRoster();
       }
-      
+
+      //Renders the position mix
+      function renderPositionMix(teamCode){
+        const svg = document.getElementById("position-mix");
+        svg.innerHTML = "";
+        const svgNS = "http://www.w3.org/2000/svg";
+
+        const positions = ["PG", "SG", "SF", "PF", "C"];
+        const margin = 60;
+        const width = 500;
+        const rowHeight = 50;
+        const height = positions.length * rowHeight + 40;
+        svg.setAttribute("viewBox", `0 0  ${width} ${height}`);
+        svg.setAttribute("height", height);
+
+        const realRoster = playerStats.filter(p => p.currentTeam === teamCode);
+        const hypoRoster = getHypotheticalRoster(teamCode);
+        const realCounts = countByPosition(realRoster);
+        const hypoCounts = countByPosition(hypoRoster);
+
+        const maxCount = Math.max(...positions.map(pos => Math.max(realCounts[pos], hypoCounts[pos])), 1);
+     
+        function scaleX(count){
+          return margin + (count / maxCount) * (width - margin - 40);
+        }
+
+        positions.forEach((pos, i) => {
+          const y = i *rowHeight + rowHeight / 2;
+
+          const label = document.createElementNS(svgNS, "text");
+          label.setAttribute("x", margin - 10);
+          label.setAttribute("y", y);
+          label.setAttribute("text-anchor", "end");
+          label.setAttribute("dominant-baseline", "middle");
+          label.setAttribute("font-size", "12");
+          label.textContent = pos;
+          svg.appendChild(label);
+
+          const realX = scaleX(realCounts[pos]);
+          const hypoX = scaleX(hypoCounts[pos]);
+
+          const line = document.createElementNS(svgNS, "line");
+          line.setAttribute("x1", realX);
+          line.setAttribute("x2", hypoX);
+          line.setAttribute("y1", y);
+          line.setAttribute("y2", y);
+          line.setAttribute("stroke", "#ccc");
+          line.setAttribute("stroke-width", "2")
+          svg.appendChild(line);
+
+          const realDot = document.createElementNS(svgNS, "circle");
+          realDot.setAttribute("cx", realX);
+          realDot.setAttribute("cy", y);
+          realDot.setAttribute("r", 6);
+          realDot.setAttribute("fill", "steelblue");
+          svg.appendChild(realDot);
+
+          const hypoDot = document.createElementNS(svgNS, "circle");
+          hypoDot.setAttribute("cx", hypoX);
+          hypoDot.setAttribute("cy", y);
+          hypoDot.setAttribute("r", 6);
+          hypoDot.setAttribute("fill", "darkorange");
+          svg.appendChild(hypoDot);
+
+        })
+      }
+
+      function countByPosition(roster){
+        const counts = {PG: 0, SG: 0, SF: 0, PF:0, C: 0};
+        for(const player of roster){
+          counts[player.Pos]++;
+        }
+        return counts;
+      }
   </script>
 </body>
 </html>
