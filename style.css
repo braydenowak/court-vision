@@ -287,4 +287,7 @@ header {
     border-radius: 999px;
   }
 
-  
+  .suggestions:empty {
+    border: none;
+    background: none;
+  }
