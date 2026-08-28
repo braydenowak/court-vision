@@ -81,17 +81,19 @@
 
   <!-- Player Comparison Panel-->
   <div id="player-comparison" class="tab-panel">
-    <div class="player-search-wrapper">
-      <input type="text" id="player-search-1" placeholder="Search player..." autocomplete="off">
-      <div id="player-suggestions-1" class="suggestions"></div>
-    </div>
-    <div class="player-search-wrapper">
-      <input type="text" id="player-search-2" placeholder="Search player..." autocomplete="off">
-      <div id="player-suggestions-2" class="suggestions"></div>
-    </div>
-    <div class="player-search-wrapper">
-      <input type="text" id="player-search-3" placeholder="Search player..." autocomplete="off">
-      <div id="player-suggestions-3" class="suggestions"></div>
+    <div class="player-search-row">
+      <div class="player-search-wrapper">
+        <input type="text" id="player-search-1" placeholder="Search player..." autocomplete="off">
+        <div id="player-suggestions-1" class="suggestions"></div>
+      </div>
+      <div class="player-search-wrapper">
+        <input type="text" id="player-search-2" placeholder="Search player..." autocomplete="off">
+        <div id="player-suggestions-2" class="suggestions"></div>
+      </div>
+      <div class="player-search-wrapper">
+        <input type="text" id="player-search-3" placeholder="Search player..." autocomplete="off">
+        <div id="player-suggestions-3" class="suggestions"></div>
+      </div>
     </div>
     <svg id="radar-chart" viewBox="0 0 500 500" width="500" height="500"></svg>
     <table id = "player-table">
@@ -121,10 +123,26 @@
       <input type="text" id="add-player-search" placeholder="Search player to add..." autocomplete="off">
       <div id="add-player-suggestions" class="suggestions"></div>
     </div>
+    
+    <div class="chart-card">
+      <h2>Roster</h2>
+      <div id="roster-list"></div>
+    </div>
+    
+    <div class="chart-card">
+      <h2>Removed Players</h2>
+      <div id="removed-chips"></div>
+    </div>
+
     <div id="team-fingerprint"></div>
-    <div id="removed-chips"></div>
-    <div id="roster-list"></div>
-    <svg id="position-mix" width="500"></svg>
+    <div class="chart-card">
+      <h2>Position Mix</h2>
+      <div class="chart-legend">
+        <div class="legend-item"><span class="legend-dot current"></span> Today's Roster</div>
+        <div class="legend-item"><span class="legend-dot hypothetical"></span> Your Roster</div>
+      </div>
+      <svg id="position-mix" width="500"></svg>
+    </div>
   </div>
 
   <script src="player_stats.js"></script>
@@ -217,7 +235,7 @@
         for (const panel of panels){
           panel.style.display = "none";
         }
-        document.getElementById(tabId).style.display = "block";
+        document.getElementById(tabId).style.display = "flex";
 
         const buttons = document.querySelectorAll("#tab-buttons button");
         for (const button of buttons){
@@ -579,7 +597,8 @@
 
         for (const player of roster){
           const row = document.createElement("div");
-          row.innerHTML = `${player.Player} - ${player.Pos} - PER ${player.PER} <button onclick="removePlayer('${player["Player ID"]}')">Remove</button>`;
+          row.className = "roster-row";
+          row.innerHTML = `<span>${player.Player} — ${player.Pos} — PER ${player.PER}</span> <button onclick="removePlayer('${player["Player ID"]}')">Remove</button>`;
           container.appendChild(row);
         }
       }
@@ -667,6 +686,7 @@
         const roster = playerStats.filter(p => p.currentTeam === teamCode && removedPlayerIds.includes(p["Player ID"]));
         for(const player of roster){
           const div = document.createElement("div");
+          div.className = "chip";
           div.innerHTML = `${player.Player} <button onclick="addBackPlayer('${player["Player ID"]}')">Add Back</button>`;
           container.appendChild(div);
         }
@@ -702,6 +722,19 @@
           return margin + (count / maxCount) * (width - margin - 40);
         }
 
+        //Create gridlines
+        for (let count = 0; count <= maxCount; count++){
+          const x = scaleX(count);
+          const line = document.createElementNS(svgNS, "line");
+          line.setAttribute("x1", x);
+          line.setAttribute("x2", x);
+          line.setAttribute("y1", 10);
+          line.setAttribute("y2", height-20);
+          line.setAttribute("stroke", "#ddd");
+          line.setAttribute("stroke-width", "2")
+          svg.appendChild(line);
+        }
+
         positions.forEach((pos, i) => {
           const y = i *rowHeight + rowHeight / 2;
 
@@ -733,12 +766,30 @@
           realDot.setAttribute("fill", "steelblue");
           svg.appendChild(realDot);
 
+          const realLabel = document.createElementNS(svgNS, "text");
+          realLabel.setAttribute("x", realX);
+          realLabel.setAttribute("y", y - 12);
+          realLabel.setAttribute("text-anchor", "middle");
+          realLabel.setAttribute("font-size", "10");
+          realLabel.setAttribute("fill", "steelblue");
+          realLabel.textContent = realCounts[pos];
+          svg.appendChild(realLabel);
+
           const hypoDot = document.createElementNS(svgNS, "circle");
           hypoDot.setAttribute("cx", hypoX);
           hypoDot.setAttribute("cy", y);
           hypoDot.setAttribute("r", 6);
           hypoDot.setAttribute("fill", "darkorange");
           svg.appendChild(hypoDot);
+
+          const hypoLabel = document.createElementNS(svgNS, "text");
+          hypoLabel.setAttribute("x", hypoX);
+          hypoLabel.setAttribute("y", y + 20);
+          hypoLabel.setAttribute("text-anchor", "middle");
+          hypoLabel.setAttribute("font-size", "10");
+          hypoLabel.setAttribute("fill", "darkorange");
+          hypoLabel.textContent = hypoCounts[pos];
+          svg.appendChild(hypoLabel);
 
         })
       }
