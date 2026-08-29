@@ -374,7 +374,7 @@
           circle.setAttribute("cx", cx);
           circle.setAttribute("cy", cy);
           circle.setAttribute("r", 5);
-          circle.setAttribute("fill", "steelblue");
+          circle.setAttribute("fill", "#fab56c");
           svg.appendChild(circle);
 
           const label = document.createElementNS(svgNS, "text");
@@ -415,15 +415,7 @@
           return margin + ((value - minVal) / (maxVal - minVal)) * (width - margin - 20);
         }
 
-        //Zero reference Line
-        const line = document.createElementNS(svgNS, "line");
-        line.setAttribute("x1", scaleValue(0));
-        line.setAttribute("x2", scaleValue(0));
-        line.setAttribute("y1", 0);
-        line.setAttribute("y2", height-24);
-        line.setAttribute("stroke", "#667");
-        line.setAttribute("stroke-width", "2")
-        svg.appendChild(line);
+        
 
         sorted.forEach((team, i) => {
           const y = i *rowHeight;
@@ -432,14 +424,25 @@
           const barX = Math.min(zeroX, valueX);
           const barWidth = Math.abs(zeroX - valueX);
 
-          
+          //Fill Bars
+          const fillBar = document.createElementNS(svgNS, "rect");
+          fillBar.setAttribute("x", barX);
+          fillBar.setAttribute("y", y);
+          fillBar.setAttribute("width", 480);
+          fillBar.setAttribute("rx", 3);
+          fillBar.setAttribute("height", rowHeight - 4);
+          fillBar.setAttribute("fill", "#D3D3D3");
+          svg.appendChild(fillBar);
+
+
           //Bar
           const bar = document.createElementNS(svgNS, "rect");
           bar.setAttribute("x", barX);
           bar.setAttribute("y", y);
           bar.setAttribute("width", barWidth);
+          bar.setAttribute("rx", 3);
           bar.setAttribute("height", rowHeight - 4);
-          bar.setAttribute("fill", "steelblue");
+          bar.setAttribute("fill", i == 0 ? "#ea7b40" : "#fab56c");
           svg.appendChild(bar);
 
           //Label
@@ -449,10 +452,20 @@
           label.setAttribute("font-size", "10");
           label.setAttribute("text-anchor", "end");
           label.setAttribute("dominant-baseline", "middle");
-          label.textContent = team.Team;
+          label.setAttribute("fill", i == 0 ? "#1C1C1A" : "#6B6B66");
+          label.textContent = `${i+1}. ${team.Team}`;
           svg.appendChild(label);
 
         });
+        //Zero reference Line
+        const line = document.createElementNS(svgNS, "line");
+        line.setAttribute("x1", scaleValue(0));
+        line.setAttribute("x2", scaleValue(0));
+        line.setAttribute("y1", 0);
+        line.setAttribute("y2", height-24);
+        line.setAttribute("stroke", "#667");
+        line.setAttribute("stroke-width", "2")
+        svg.appendChild(line);
       }
 
       function updateRankingChart(){
