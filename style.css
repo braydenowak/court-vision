@@ -26,298 +26,305 @@ body {
   padding: 24px;
 }
 
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 24px;
+}
+
 header {
-    margin-bottom: 24px;
-  }
-  
-  h1 {
-    font-family: 'Abril Fatface', serif;
-    font-size: 64px;
-    margin: 0;
-    letter-spacing: 1px;
-  }
-  
-  .tagline {
-    color: var(--ink-muted);
-    margin: 4px 0 0 0;
-  }
-  
-  #tab-buttons {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
-    border-bottom: 2px solid var(--border);
-  }
-  
-  #tab-buttons button {
-    font-family: 'Public Sans', sans-serif;
-    font-weight: 600;
-    font-size: 14px;
-    padding: 10px 16px;
-    border: none;
-    background: none;
-    color: var(--ink-muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
-  }
-  
-  #tab-buttons button:hover {
-    color: var(--ink);
-  }
-  
-  #tab-buttons button.active {
-    color: var(--accent-primary);
-    border-bottom: 2px solid var(--accent-primary);
-  }
+  margin-bottom: 0;
+}
 
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    font-size: 14px;
-  }
+#tab-buttons {
+  margin-bottom: 0;
+  border-bottom: none;
+}
 
-  th, td {
-    padding: 8px 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
+h1 {
+  font-family: 'Abril Fatface', serif;
+  font-size: 64px;
+  margin: 0;
+  letter-spacing: 1px;
+}
 
-  th {
-    cursor: pointer;
-    font-weight: 600;
-    color: var(--ink-muted);
-    user-select: none;
-  }
+.tagline {
+  color: var(--ink-muted);
+  margin: 4px 0 0 0;
+}
 
-  th:hover {
-    color: var(--ink);
-  }
 
-  tbody tr:nth-child(even) {
-    background-color: var(--surface);
-  }
+#tab-buttons button {
+  font-family: 'Public Sans', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  color: var(--ink-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
 
-  #team-fingerprint{
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 24px;
-  }
+#tab-buttons button:hover {
+  color: var(--ink);
+}
 
-  .stat-tile {
-    background-color: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 16px;
-    text-align: center;
-  }
+#tab-buttons button.active {
+  color: var(--accent-primary);
+  border-bottom: 2px solid var(--accent-primary);
+}
 
-  .stat-value {
-    font-family: 'Abril Fatface', serif;
-    font-size: 32px;
-    color: var(--ink);
-  }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+}
 
-  .stat-label {
-    font-size: 12px;
-    color: var(--ink-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 4px;
-  }
+th, td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
 
-  button {
-    font-family: 'Public Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 6px 12px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background-color: var(--surface);
-    color: var(--ink);
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: var(--paper);
-    border-color: var(--ink-muted);
-  }
-  
-  select {
-    font-family: 'Public Sans', sans-serif;
-    font-size: 13px;
-    padding: 6px 10px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background-color: var(--surface);
-    color: var(--ink);
-    cursor: pointer;
-  }
+th {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink-muted);
+  user-select: none;
+}
 
-  .player-search-wrapper {
-    position: relative;
-    display: inline-block;
-    margin-right: 12px;
-  }
-  
-  .suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background-color: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    width: 200px;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 10;
-  }
-  
-  .suggestion-item {
-    padding: 6px 10px;
-    cursor: pointer;
-    font-size: 13px;
-  }
-  
-  .suggestion-item:hover {
-    background-color: var(--paper);
-  }
+th:hover {
+  color: var(--ink);
+}
 
-  #radar-chart {
-    display: block;
-    margin-top: 16px;
-  }
+tbody tr:nth-child(even) {
+  background-color: var(--surface);
+}
 
-  #team-scatter, #ranking-chart, #position-mix {
-    display: block;
-    margin-top: 16px;
-  }
+#team-fingerprint{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
 
-  .tab-panel{
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    align-items: flex-start;
-  }
+.stat-tile {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+}
 
-  .player-search-row {
-    display: flex;
-    gap: 12px;
-  }
+.stat-value {
+  font-family: 'Abril Fatface', serif;
+  font-size: 32px;
+  color: var(--ink);
+}
 
-  .charts-row {
-    display: flex;
-    gap: 16px;
-  }
-  
-  .charts-row .chart-card {
-    flex: 1;
-    min-width: 0;
-  }
+.stat-label {
+  font-size: 12px;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
 
-  .chart-card {
-    background-color: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 16px;
-  }
-  
-  .chart-card h2 {
-    font-family: 'Public Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--ink-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0 0 12px 0;
-  }
+button {
+  font-family: 'Public Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
 
-  .chart-card h3 {
-    font-family: 'Public Sans', sans-serif;
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--ink-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0 0 12px 0;
-  }
-  
-  .chart-legend {
-    display: flex;
-    gap: 16px;
-    font-size: 12px;
-    color: var(--ink-muted);
-    margin-bottom: 8px;
-  }
-  
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  
-  .legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-  
-  .legend-dot.current {
-    background-color: steelblue;
-  }
-  
-  .legend-dot.hypothetical {
-    background-color: darkorange;
-  }
+button:hover {
+  background-color: var(--paper);
+  border-color: var(--ink-muted);
+}
 
-  .roster-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 14px;
-  }
-  
-  .roster-row:last-child {
-    border-bottom: none;
-  }
-  
-  .roster-row:hover {
-    background-color: var(--paper);
-  }
+select {
+  font-family: 'Public Sans', sans-serif;
+  font-size: 13px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
 
-  #removed-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  
-  .chip {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background-color: var(--paper);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 4px 6px 4px 12px;
-    font-size: 13px;
-  }
-  
-  .chip button {
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 999px;
-  }
+.player-search-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-right: 12px;
+}
 
-  .suggestions:empty {
-    border: none;
-    background: none;
-  }
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  width: 200px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+}
 
-  #team-scatter, #ranking-chart {
-    width: 100%;
-    height: auto;
-  }
+.suggestion-item {
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.suggestion-item:hover {
+  background-color: var(--paper);
+}
+
+#radar-chart {
+  display: block;
+  margin-top: 16px;
+}
+
+#team-scatter, #ranking-chart, #position-mix {
+  display: block;
+  margin-top: 16px;
+}
+
+.tab-panel{
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.player-search-row {
+  display: flex;
+  gap: 12px;
+}
+
+.charts-row {
+  display: flex;
+  gap: 16px;
+}
+
+.charts-row .chart-card {
+  flex: 1;
+  min-width: 0;
+}
+
+.chart-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.chart-card h2 {
+  font-family: 'Public Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 12px 0;
+}
+
+.chart-card h3 {
+  font-family: 'Public Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 12px 0;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--ink-muted);
+  margin-bottom: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-dot.current {
+  background-color: steelblue;
+}
+
+.legend-dot.hypothetical {
+  background-color: darkorange;
+}
+
+.roster-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.roster-row:last-child {
+  border-bottom: none;
+}
+
+.roster-row:hover {
+  background-color: var(--paper);
+}
+
+#removed-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 6px 4px 12px;
+  font-size: 13px;
+}
+
+.chip button {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.suggestions:empty {
+  border: none;
+  background: none;
+}
+
+#team-scatter, #ranking-chart {
+  width: 100%;
+  height: auto;
+}
