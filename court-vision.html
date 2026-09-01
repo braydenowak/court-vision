@@ -428,12 +428,21 @@
           const fillBar = document.createElementNS(svgNS, "rect");
           fillBar.setAttribute("x", barX);
           fillBar.setAttribute("y", y);
-          fillBar.setAttribute("width", 480);
+          fillBar.setAttribute("width", width - margin - 20);
           fillBar.setAttribute("rx", 3);
           fillBar.setAttribute("height", rowHeight - 4);
           fillBar.setAttribute("fill", "#D3D3D3");
           svg.appendChild(fillBar);
 
+          // Numerics next to Bar
+          const  numeric = document.createElementNS(svgNS, "text");
+          numeric.setAttribute("x", width);
+          numeric.setAttribute("y", y+7);
+          numeric.setAttribute("font-size", "10");
+          numeric.setAttribute("text-anchor", "end");
+          numeric.setAttribute("dominant-baseline", "middle");
+          numeric.textContent = team[key].toFixed(1);
+          svg.appendChild(numeric);
 
           //Bar
           const bar = document.createElementNS(svgNS, "rect");
