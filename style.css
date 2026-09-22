@@ -168,6 +168,10 @@ select {
   margin-right: 12px;
 }
 
+.player-search-wrapper input {
+  width: 150px;
+}
+
 .suggestions {
   position: absolute;
   top: 100%;
@@ -194,6 +198,8 @@ select {
 #radar-chart {
   display: block;
   margin-top: 16px;
+  width:100%;
+  height: auto;
 }
 
 #team-scatter, #ranking-chart, #position-mix {
@@ -210,12 +216,14 @@ select {
 
 .player-search-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
 }
 
 .charts-row {
   display: flex;
   gap: 16px;
+  width: 100%;
 }
 
 .charts-row .chart-card {
@@ -327,4 +335,23 @@ select {
 #team-scatter, #ranking-chart {
   width: 100%;
   height: auto;
+}
+
+#player-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.player-name {
+  font-family: 'Abril Fatface', serif;
+  font-size: 36px;
+  margin: 0;
+}
+
+.player-meta {
+  color: var(--ink-muted);
+  font-size: 16px;
+  margin-top: 4px;
+  margin-bottom: 16px;
 }
