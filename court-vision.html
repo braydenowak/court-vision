@@ -99,14 +99,17 @@
             <div class="player-search-wrapper">
               <input type="text" id="player-search-1" placeholder="Search player..." autocomplete="off">
               <div id="player-suggestions-1" class="suggestions"></div>
+              <div id="player-color-1" class="player-color-tag"></div>
             </div>
             <div class="player-search-wrapper">
               <input type="text" id="player-search-2" placeholder="Search player..." autocomplete="off">
               <div id="player-suggestions-2" class="suggestions"></div>
+              <div id="player-color-2" class="player-color-tag"></div>
             </div>
             <div class="player-search-wrapper">
               <input type="text" id="player-search-3" placeholder="Search player..." autocomplete="off">
               <div id="player-suggestions-3" class="suggestions"></div>
+              <div id="player-color-3" class="player-color-tag"></div>
             </div>
           </div>
           <svg id="radar-chart" viewBox="0 0 500 500" width="500" height="500"></svg>
@@ -598,7 +601,14 @@
         const players = getSelectedPlayers();
         for(let i = 0; i < polygonColors.length; i++){
           renderPlayerPolygon(players[i],polygonColors[i]);
+
+          const tag = document.getElementById(`player-color-${i + 1}`);
+          tag.innerHTML=`<span class ="color-dot" style="background:${polygonColors[i]}"></span>`;
+          tag.append(players[i] ? players[i].Player : "No player");
+          tag.style.borderColor = polygonColors[i]
         }
+
+        
       }
 
       //Player Stats
