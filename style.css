@@ -374,3 +374,35 @@ select {
   border-radius: 50%;
   flex-shrink: 0;
 }
+
+.stat-info-header {
+  font-family: 'Abril Fatface', serif;
+  font-size: 36px;
+  margin: 0;
+}
+
+.stat-row{
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+
+}
+
+.stat-header{
+  flex: 0 0 80px; 
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.stat-info{
+  flex: 1;
+  margin: 0;
+  line-height: 1.5;
+  color: var(--ink);
+}

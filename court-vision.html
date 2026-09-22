@@ -18,6 +18,7 @@
         <button onclick="showTab('team-analytics', this)">Team Analytics</button>
         <button onclick="showTab('player-comparison', this)">Player Comparison</button>
         <button onclick="showTab('roster-lab', this)">Roster Lab</button>
+        <button onclick="showTab('stat-info', this)">Stat Info</button>
       </div>
     </div>
 
@@ -143,8 +144,6 @@
     </div>
   
 
-  
-
     <!-- Roster Lab Panel-->
     <div id="roster-lab" class="tab-panel">
       <select id="team-select" onchange="handleTeamChange()"></select>
@@ -174,6 +173,13 @@
         <svg id="position-mix" width="500"></svg>
       </div>
     </div>
+
+    <!-- Stat Info Panel-->
+     <div id="stat-info" class="tab-panel">
+        <div class="chart-card">
+          <div id="stat-info-list"></div>
+        </div>
+     </div>
   </div>
 
   <script src="player_stats.js"></script>
@@ -623,8 +629,8 @@
 
         const header = document.createElement('div');
         header.innerHTML = `
-          <div class="player-name">${player.Player}<\div>
-          <div class="player-meta">${player.Pos} &middot; ${player.currentTeam}<\div>
+          <div class="player-name">${player.Player}</div>
+          <div class="player-meta">${player.Pos} &middot; ${player.currentTeam}</div>
         `;
         container.appendChild(header);
 
@@ -699,7 +705,7 @@
         container.innerHTML="";
 
         for (const player of roster){
-          const row = document.createElement("div");
+          const row = document.createElement('div');
           row.className = "roster-row";
           row.innerHTML = `<span>${player.Player} — ${player.Pos} — PER ${player.PER}</span> <button onclick="removePlayer('${player["Player ID"]}')">Remove</button>`;
           container.appendChild(row);
@@ -931,6 +937,44 @@
         }
       );
       
+
+    //****** Stat Info Stuff *******
+
+    //render Stat Info list
+    function renderStatInfo(){
+      const container = document.getElementById("stat-info-list");
+      container.innerHTML = ""
+
+      const header = document.createElement('div');
+        header.innerHTML = ` <div class="stat-info-header">Statistic Information</div>`;
+       
+        container.appendChild(header);
+
+      const statInfo = [
+        "Player Efficiency Rating is a single advanced metric that measures a basketball player's overall per-minute productivity. Created by sports analyst John Hollinger, PER combines all of a player's positive contributions and subtracts their negative actions into one easy-to-read number",
+        "True Shooting Percentage is an advanced basketball statistic that measures a player's total scoring efficiency by combining 2-pointers, 3-pointers, and free throws into one metric",
+        "Total Rebound Percentage is an advanced metric that estimates the percentage of available rebounds a player grabs while they are on the court",
+        "Assist Percentage is an advanced statistic that estimates the percentage of a team's made field goals that a specific player assisted on while they were on the court",
+        "Usage percentage estimates the percentage of team plays or possessions that a player finishes with a shot attempt, a trip to the free-throw line, or a turnover while they are on the court",
+        "Win Shares Per 48 Minutes is an advanced metric that estimates the number of wins a player contributes to their team per 48 minutes of playing time (a standard regulation game length)",
+        "Box Plus/Minus is a statistical metric that estimates a player's total contribution to their team per 100 possessions.",
+      ]
+      
+      for (let i = 0; i < radarStats.length; i++){
+        const row = document.createElement('div');
+        row.className = 'stat-row';
+        row.innerHTML= `
+            <div class="stat-header">${radarStats[i]}</div>
+            <div class="stat-info">${statInfo[i]}</div>
+        `;
+
+        container.appendChild(row);
+      }
+
+    }
+
+    renderStatInfo();
+
   
     //Search bar functions
     function setupPlayerSearch(inputId, suggestionsId, getCandidates, onSelect) {
