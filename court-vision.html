@@ -145,39 +145,56 @@
   
 
     <!-- Roster Lab Panel-->
-    <div id="roster-lab" class="tab-panel">
-      <select id="team-select" onchange="handleTeamChange()"></select>
-      <button onclick="resetRoster()">Reset to current roster</button>
-      <div class="player-search-wrapper">
-        <input type="text" id="add-player-search" placeholder="Search player to add..." autocomplete="off">
-        <div id="add-player-suggestions" class="suggestions"></div>
-      </div>
-      
-      <div class="chart-card">
-        <h2>Roster</h2>
-        <div id="roster-list"></div>
-      </div>
-      
-      <div class="chart-card">
-        <h2>Removed Players</h2>
-        <div id="removed-chips"></div>
-      </div>
+        <!-- Roster Lab Panel-->
+        <div id="roster-lab" class="tab-panel">
 
-      <div class="chart-card">
-        <h2>Projected Record</h2>
-        <div id="projection"></div>
-      </div>
-
-      <div id="team-fingerprint"></div>
-      <div class="chart-card">
-        <h2>Position Mix</h2>
-        <div class="chart-legend">
-          <div class="legend-item"><span class="legend-dot current"></span> Today's Roster</div>
-          <div class="legend-item"><span class="legend-dot hypothetical"></span> Your Roster</div>
+          <!-- Controls -->
+          <div class="rl-toolbar chart-card">
+            <select id="team-select" onchange="handleTeamChange()"></select>
+            <div class="player-search-wrapper">
+              <input type="text" id="add-player-search" placeholder="Search player to add..." autocomplete="off">
+              <div id="add-player-suggestions" class="suggestions"></div>
+            </div>
+            <button onclick="resetRoster()">Reset to current roster</button>
+          </div>
+    
+          <!-- Scoreboard: projection + fingerprint -->
+          <div class="rl-scoreboard">
+            <div class="chart-card">
+              <h2>Projected Record</h2>
+              <div id="projection"></div>
+            </div>
+            <div class="chart-card">
+              <h2>Team Fingerprint</h2>
+              <div id="team-fingerprint"></div>
+            </div>
+          </div>
+    
+          <!-- Workbench: roster + side panel -->
+          <div class="rl-main">
+            <div class="chart-card">
+              <h2>Roster</h2>
+              <div id="roster-list"></div>
+            </div>
+    
+            <div class="rl-side">
+              <div class="chart-card">
+                <h2>Position Mix</h2>
+                <div class="chart-legend">
+                  <div class="legend-item"><span class="legend-dot current"></span> Today's Roster</div>
+                  <div class="legend-item"><span class="legend-dot hypothetical"></span> Your Roster</div>
+                </div>
+                <svg id="position-mix" width="500"></svg>
+              </div>
+    
+              <div class="chart-card">
+                <h2>Removed Players</h2>
+                <div id="removed-chips"></div>
+              </div>
+            </div>
+          </div>
+    
         </div>
-        <svg id="position-mix" width="500"></svg>
-      </div>
-    </div>
 
     <!-- Stat Info Panel-->
      <div id="stat-info" class="tab-panel">
