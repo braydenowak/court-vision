@@ -163,6 +163,11 @@
         <div id="removed-chips"></div>
       </div>
 
+      <div class="chart-card">
+        <h2>Projected Record</h2>
+        <div id="projection"></div>
+      </div>
+
       <div id="team-fingerprint"></div>
       <div class="chart-card">
         <h2>Position Mix</h2>
@@ -711,12 +716,109 @@
           container.appendChild(row);
         }
       }
+            //****** Win Projection *******
+      // Real 2025-26 records, for comparison
+      const ACTUAL_RECORDS = {
+        ATL: [46, 36], BOS: [56, 26], BRK: [20, 62], CHI: [31, 51], CHO: [44, 38], CLE: [52, 30],
+        DAL: [26, 56], DEN: [54, 28], DET: [60, 22], GSW: [37, 45], HOU: [52, 30], IND: [19, 63],
+        LAC: [42, 40], LAL: [53, 29], MEM: [25, 57], MIA: [43, 39], MIL: [32, 50], MIN: [49, 33],
+        NOP: [26, 56], NYK: [53, 29], OKC: [64, 18], ORL: [45, 37], PHI: [45, 37], PHO: [45, 37],
+        POR: [42, 40], SAC: [22, 60], SAS: [62, 20], TOR: [46, 36], UTA: [22, 60], WAS: [17, 65]
+      };
+      const SEASON_MINUTES = 240 * 82;     // 19,680 team minutes in a season
+      const MAX_PLAYER_MINUTES = 36 * 82;  // cap: nobody plays more than ~36 mpg
+      const CALIBRATION = 0.967;           // makes league-wide wins add up to 1,230
+      const MODEL_ERROR = 3;               // avg miss vs. real records was ~2.7 wins
+
+      function projectWins(roster) {
+        // Rotation order: whoever played the most minutes plays first
+        const sorted = [...roster].sort((a, b) => b.MP - a.MP);
+
+        // Give out real minutes until the season's 19,680 are used up
+        let remaining = SEASON_MINUTES;
+        let minutes = sorted.map(p => {
+          const m = Math.max(0, Math.min(p.MP, MAX_PLAYER_MINUTES, remaining));
+          remaining -= m;
+          return m;
+        });
+
+        // Short roster: scale everyone up to fill the gap (still capped at 36 mpg)
+        for (let pass = 0; pass < 10 && remaining > 0.5; pass++) {
+          const room = total(minutes.filter(m => m > 0 && m < MAX_PLAYER_MINUTES));
+          if (room === 0) break;
+          const factor = remaining / room;
+          minutes = minutes.map(m => {
+            if (m <= 0 || m >= MAX_PLAYER_MINUTES) return m;
+            const extra = Math.min(m * factor, MAX_PLAYER_MINUTES - m);
+            remaining -= extra;
+            return m + extra;
+          });
+        }
+
+        // Wins = sum of (WS/48 x minutes / 48)
+        const rawWins = total(sorted.map((p, i) => p["WS/48"] * minutes[i] / 48));
+        const wins = Math.max(0, Math.min(82, rawWins * CALIBRATION));
+        return { wins: wins, unfilledMinutes: Math.max(0, remaining) };
+      }
+
+      function formatRecord(wins) {
+        const w = Math.round(wins);
+        return `${w}–${82 - w}`;
+      }
+
+      function renderProjection(teamCode) {
+        const container = document.getElementById("projection");
+        const realRoster = playerStats.filter(p => p.currentTeam === teamCode);
+        const base = projectWins(realRoster);
+        const proj = projectWins(getHypotheticalRoster(teamCode));
+        const actual = ACTUAL_RECORDS[teamCode];
+
+        const low = Math.max(0, Math.round(proj.wins - MODEL_ERROR));
+        const high = Math.min(82, Math.round(proj.wins + MODEL_ERROR));
+
+        const change = proj.wins - base.wins;
+        let deltaClass = "flat";
+        let deltaText = "0";
+        if (Math.abs(change) >= 0.05) {
+          deltaClass = change > 0 ? "up" : "down";
+          deltaText = `${change > 0 ? "+" : "−"}${Math.abs(change).toFixed(1)}`;
+        }
+
+        container.innerHTML = `
+          <div>
+            <div class="proj-record">${formatRecord(proj.wins)}</div>
+            <div class="proj-range">Likely range: ${low}–${high} wins</div>
+          </div>
+          <div class="proj-compare">
+            <div>
+              <div class="stat-value">${actual ? `${actual[0]}–${actual[1]}` : "—"}</div>
+              <div class="stat-label">Actual 2025–26</div>
+            </div>
+            <div>
+              <div class="stat-value">${formatRecord(base.wins)}</div>
+              <div class="stat-label">Model: today's roster</div>
+            </div>
+            <div>
+              <div class="stat-value proj-delta ${deltaClass}">${deltaText}</div>
+              <div class="stat-label">Wins from your moves</div>
+            </div>
+          </div>
+        `;
+
+        if (proj.unfilledMinutes > 1) {
+          const note = document.createElement("p");
+          note.className = "proj-note";
+          note.textContent = `Roster is short ${Math.round(proj.unfilledMinutes).toLocaleString()} minutes even with everyone at 36 mpg. Those minutes count as zero wins, so add players to fill them.`;
+          container.appendChild(note);
+        }
+      }
 
       function updateRoster() {
         const teamCode = document.getElementById("team-select").value;
         const roster = getHypotheticalRoster(teamCode);
         renderChips(teamCode);
         renderPositionMix(teamCode);
+        renderProjection(teamCode);
       
         renderRoster(roster);
         renderFingerprint(computeFingerprint(roster));
